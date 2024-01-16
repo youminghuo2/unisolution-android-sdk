@@ -45,7 +45,7 @@ afterEvaluate {
     publishing {
         publications {
             // Creates a Maven publication called "release".
-            group = 'com.example.module_frame'
+            group = 'com.github.zcyyouminghuo'
             version = '1.0.0'
             //发布release版本
             release(MavenPublication) {

@@ -39,7 +39,7 @@ afterEvaluate {
     publishing {
         publications {
             // Creates a Maven publication called "release".
-            group = 'com.example.retrofit_net'
+            group = 'com.github.zcyyouminghuo'
             version = '1.0.0'
             //发布release版本
             release(MavenPublication) {
