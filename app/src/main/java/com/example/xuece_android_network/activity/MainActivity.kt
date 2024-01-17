@@ -1,5 +1,7 @@
 package com.example.xuece_android_network.activity
 
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.viewModels
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.lifecycleScope
@@ -7,6 +9,7 @@ import com.dylanc.longan.Logger
 import com.dylanc.longan.context
 import com.dylanc.longan.lifecycleOwner
 import com.dylanc.longan.logDebug
+import com.example.module_frame.dialog.DialogManager
 import com.example.module_frame.dialog.builder.SingleDialogBuilder
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.example.xuece_android_network.common.ComDaraStore
@@ -22,10 +25,11 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
     private lateinit var dialogBuilder: SingleDialogBuilder
 
     override fun initView() {
-        lifecycleScope.launch {
-            val key = stringPreferencesKey(ComDaraStore.server_token)
-            CommonUtils.editDataStore(context, key, "1d4c12e8-5c82-4546-9557-230812f1f789")
-        }
+        //测试代码
+//        lifecycleScope.launch {
+//            val key = stringPreferencesKey(ComDaraStore.server_token)
+//            CommonUtils.editDataStore(context, key, "36288cd4-7997-4cad-b204-0757f91eb6ec")
+//        }
 
     }
 
@@ -43,7 +47,9 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
 //            val handler = Handler(Looper.getMainLooper())
 //            val runnable = object : Runnable {
 //                override fun run() {
-//                    val dialogBuilder = DialogManager.getDialog(this@MainActivity)
+//                    val dialogBuilder = DialogManager.getDialog(this@MainActivity){
+//
+//                    }
 //                    if (dialogBuilder.isDialogShowing() != true) {
 //                        dialogBuilder.show()
 //                    }

@@ -25,7 +25,7 @@ object ApiManager {
 
         val urlAndToken = application.context.dataStore.data.map { preferences ->
             Pair(
-                preferences[urlKey] ?: "https://xqdsj-stagingtest2.xuece.cn/",
+                preferences[urlKey] ?: "https://xqdsj-stagingtest2.xuece.cn/api/",
                 preferences[tokenKey] ?: ""
             )
         }.first()

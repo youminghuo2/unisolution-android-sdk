@@ -8,7 +8,7 @@ import retrofit2.http.Query
 interface UserCenterApi {
     //获取学校学期信息
 
-    @GET("/api/usercenter/common/loginuserinfo/terminfo")
+    @GET("usercenter/common/loginuserinfo/terminfo")
     suspend fun getTermInfo(
         @Query("schoolId") schoolId: Long,
     ): BaseResult<MutableList<TermEntity>>
