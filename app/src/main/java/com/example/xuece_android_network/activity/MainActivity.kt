@@ -90,18 +90,16 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
              * 测试权限说明，多权限申请代码
              */
             val permissionList= listOf(
-                PermissionListEntity(Manifest.permission.BLUETOOTH_CONNECT,PermissionEntity("蓝牙权限","当您在我们的产品中使用图片/音视频/文件的上传功能时，需要获取您设备的存储权限。不授权该权限不影响App其他功能使用")),
-                PermissionListEntity(Manifest.permission.CAMERA, PermissionEntity("相机权限","当您在我们的产品中使用数据上传功能时"))
+                PermissionListEntity(listOf(Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_ADVERTISE,Manifest.permission.BLUETOOTH_CONNECT) ,PermissionEntity("蓝牙权限","当您在我们的产品中使蓝牙")),
+                PermissionListEntity(listOf(Manifest.permission.CAMERA) , PermissionEntity("相机权限","当您在我们的产品中使用数据上传功能时")),
+                PermissionListEntity(listOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION) , PermissionEntity("地理位置权限","当您在我们的产品中使用地理位置权限"))
             )
 
             val multipleList=CommonUtils.checkSelfPermissionMultiple(context,
                 permissionList)
+
             if (multipleList.isNotEmpty()){
                 val (explainList, requireList) = processPermissions(multipleList)
-
-                val mutableList=requireList.toMutableList()
-                mutableList.add(Manifest.permission.BLUETOOTH_SCAN)
-                mutableList.add(Manifest.permission.BLUETOOTH_ADVERTISE)
 
                 val msg=explainList.joinToString(separator=","){it.title}
                 dialogMsg="请在设置中开启${msg}，以正常使用App功能"

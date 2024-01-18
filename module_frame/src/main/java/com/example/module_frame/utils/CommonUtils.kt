@@ -47,10 +47,19 @@ object CommonUtils {
     fun checkSelfPermissionMultiple(context: Context,permissionList: List<PermissionListEntity>):List<PermissionListEntity>{
         val entity= mutableListOf<PermissionListEntity>()
 
-        permissionList.forEach {
-            val result=ContextCompat.checkSelfPermission(context,it.permission)
-            if (result!=PackageManager.PERMISSION_GRANTED){
-                entity.add(it)
+        for (permissionData in permissionList) {
+            val permission = mutableListOf<String>()
+
+            for (item in permissionData.permission) {
+                val result = ContextCompat.checkSelfPermission(context, item)
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    permission.add(item)
+                }
+            }
+
+            if (permission.isNotEmpty()) {
+                val data = PermissionListEntity(permission, permissionData.dataList)
+                entity.add(data)
             }
         }
        return entity
@@ -63,13 +72,8 @@ object CommonUtils {
      *         requireList=mutableListOf<String>申请的权限列表
      */
     fun processPermissions(multipleList: List<PermissionListEntity>): Pair<List<PermissionEntity>, List<String>> {
-        val explainList = mutableListOf<PermissionEntity>()
-        val requireList = mutableListOf<String>()
-
-        multipleList.forEach { item ->
-            explainList.add(PermissionEntity(item.dataList.title, item.dataList.msg))
-            requireList.add(item.permission)
-        }
+        val explainList=multipleList.map { PermissionEntity(it.dataList.title,it.dataList.msg) }
+        val requireList=multipleList.flatMap { it.permission }
 
         return Pair(explainList, requireList)
     }
