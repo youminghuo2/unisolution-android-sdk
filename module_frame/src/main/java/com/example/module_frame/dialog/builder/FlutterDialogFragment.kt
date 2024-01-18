@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment
 import com.example.module_frame.databinding.FragmentDialogXueceBinding
 import com.example.module_frame.extend.dip
 
-class FlutterDialogFragment(title: String,message: String,negativeButtonText:String,setPositiveButton:String,dialogCancelable:Boolean) : DialogFragment() {
+class FlutterDialogFragment(title: String,message: String,negativeButtonText:String,positiveButtonText:String,dialogCancelable:Boolean,mFragmentListener:CallBackListener) : DialogFragment() {
     private var dialogBinding: FragmentDialogXueceBinding? = null
     private val binding get() = dialogBinding!!
 
@@ -31,6 +31,15 @@ class FlutterDialogFragment(title: String,message: String,negativeButtonText:Str
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         dialogBinding = FragmentDialogXueceBinding.inflate(LayoutInflater.from(requireContext()), container, false)
         return binding.root
+    }
+
+    init {
+        this.title=title
+        this.message=message
+        this.negativeButtonText=negativeButtonText
+        this.positiveButtonText=positiveButtonText
+        this.dialogCancelable=dialogCancelable
+        this.mFragmentListener=mFragmentListener
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
