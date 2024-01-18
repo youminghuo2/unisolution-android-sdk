@@ -22,6 +22,7 @@ import com.example.module_frame.dialog.PermissionExplainHelper
 import com.example.module_frame.dialog.PermissionExplainHelper.dismissExplain
 import com.example.module_frame.dialog.PermissionExplainHelper.showExplain
 import com.example.module_frame.dialog.XueCeDialogBuilder
+import com.example.module_frame.dialog.builder.FlutterDialogFragment
 import com.example.module_frame.dialog.builder.SingleDialogBuilder
 import com.example.module_frame.dialog.builder.XueCeDialogFragment
 import com.example.module_frame.entity.PermissionEntity
@@ -119,12 +120,19 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
                 it ->
             dismissExplain()
             if (it.values.any { !it }){
-                XueCeDialogBuilder(this).setTitle("权限申请").setMessage(dialogMsg).setNegativeButton("取消").setCancelable(false).setPositiveButton("确定",object:XueCeDialogFragment.OnClickListener{
-                    override fun onClick(dialog: Dialog?) {
-                        dialog?.dismiss()
-                        launchAppSettings()
-                    }
-                }).show()
+//                XueCeDialogBuilder(this).setTitle("权限申请").setMessage(dialogMsg).setNegativeButton("取消").setCancelable(false).setPositiveButton("确定",object:XueCeDialogFragment.OnClickListener{
+//                    override fun onClick(dialog: Dialog?) {
+//                        dialog?.dismiss()
+//                        launchAppSettings()
+//                    }
+//                }).show()
+               FlutterDialogFragment("权限申请",dialogMsg,"取消","确定",false,object :FlutterDialogFragment.OnClickListener{
+                   override fun onClick(dialog: Dialog?) {
+                       dialog?.dismiss()
+                       launchAppSettings()
+                   }
+               }).show(supportFragmentManager,"")
+
             }
         }
 

@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment
 import com.example.module_frame.databinding.FragmentDialogXueceBinding
 import com.example.module_frame.extend.dip
 
-class FlutterDialogFragment(title: String,message: String,negativeButtonText:String,positiveButtonText:String,dialogCancelable:Boolean,mFragmentListener:CallBackListener) : DialogFragment() {
+class FlutterDialogFragment(title: String,message: String,negativeButtonText:String,positiveButtonText:String,dialogCancelable:Boolean,listener: OnClickListener) : DialogFragment() {
     private var dialogBinding: FragmentDialogXueceBinding? = null
     private val binding get() = dialogBinding!!
 
@@ -26,7 +26,7 @@ class FlutterDialogFragment(title: String,message: String,negativeButtonText:Str
     private var positiveButtonListener: OnClickListener? = null
     private var negativeButtonListener: OnClickListener? = null
     private var isCenter = false
-    private var mFragmentListener: CallBackListener? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         dialogBinding = FragmentDialogXueceBinding.inflate(LayoutInflater.from(requireContext()), container, false)
@@ -39,7 +39,7 @@ class FlutterDialogFragment(title: String,message: String,negativeButtonText:Str
         this.negativeButtonText=negativeButtonText
         this.positiveButtonText=positiveButtonText
         this.dialogCancelable=dialogCancelable
-        this.mFragmentListener=mFragmentListener
+        this.positiveButtonListener=listener
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,7 +86,9 @@ class FlutterDialogFragment(title: String,message: String,negativeButtonText:Str
             binding.btnPositive.visibility = View.GONE
         }
         binding.btnPositive.setOnClickListener {
-            positiveButtonListener?.onClick(dialog) ?: kotlin.run { }
+            positiveButtonListener?.onClick(dialog) ?: kotlin.run {
+
+            }
 
         }
         binding.btnNegative.setOnClickListener {
@@ -142,11 +144,4 @@ class FlutterDialogFragment(title: String,message: String,negativeButtonText:Str
         this.isCenter = center
     }
 
-    fun setFragmentListener(listener: CallBackListener) {
-        mFragmentListener = listener
-    }
-
-    interface CallBackListener {
-        fun returnFragmentData(message: String?)
-    }
 }
