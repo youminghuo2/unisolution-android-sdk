@@ -18,5 +18,7 @@ class LoadingDialogFragment : BaseViewBindingDialogFragment<FragmentLoadingDialo
         dialog?.window?.setDimAmount(0.0f)
     }
 
-
+    fun setTitle(title: String) {
+        binding.tvLoading.text = title
+    }
 }

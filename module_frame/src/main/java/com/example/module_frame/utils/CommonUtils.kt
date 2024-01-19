@@ -3,6 +3,11 @@ package com.example.module_frame.utils
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -10,6 +15,8 @@ import com.example.module_frame.entity.PermissionEntity
 import com.example.module_frame.entity.PermissionListEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 /**
  * 常用工具列
@@ -78,6 +85,34 @@ object CommonUtils {
         return Pair(explainList, requireList)
     }
 
+
+    //更改textview字体颜色，大小
+    fun setTextColor(textView: TextView, text: String, start: Int, end: Int, color: Int, type:Int= Spanned.SPAN_EXCLUSIVE_EXCLUSIVE, changeSize:Boolean=false, size:Int=12) {
+        val spannableString = SpannableString(text)
+        spannableString.setSpan(
+            ForegroundColorSpan(color),
+            start,
+            end,
+            type
+        )
+        if (changeSize){
+            spannableString.setSpan(
+                AbsoluteSizeSpan(size),
+                start,
+                end,
+                type
+            )
+        }
+
+        textView.text = spannableString
+    }
+
+    //保留2位小数，计算正确率等百分比，如 "正确率: ${CommonUtils.getNoMoreDigits(homeWorkCenterEntity.correctRate.times(100))}%"
+    fun getNoMoreDigits(number: Double): String {
+        val format = DecimalFormat("#0.##")
+        format.roundingMode = RoundingMode.FLOOR
+        return format.format(number)
+    }
 
 
 
