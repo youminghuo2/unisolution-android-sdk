@@ -14,6 +14,8 @@ import androidx.datastore.preferences.core.edit
 import com.example.module_frame.entity.PermissionEntity
 import com.example.module_frame.entity.PermissionListEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -38,6 +40,14 @@ object CommonUtils {
             settings.clear()
         }
     }
+
+    //获取dataStore
+     suspend fun <T> getDataStore(context: Context,key:Preferences.Key<T>):Flow<T?>{
+         return context.dataStore.data.map { preferences->
+             preferences[key]
+         }
+     }
+
 
     //检查权限是否被授权
     fun checkSelfPermission(context: Context, permission: String): Boolean {
