@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
@@ -38,6 +39,7 @@ class PermissionExplainDialog : DialogFragment() {
             container,
             false
         )
+        dialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
         return binding.root
     }
 
