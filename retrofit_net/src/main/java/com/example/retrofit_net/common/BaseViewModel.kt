@@ -6,7 +6,7 @@ import com.blankj.utilcode.util.LogUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModel : ViewModel() {
+open class BaseViewModel : ViewModel() {
 
     fun launchUI(
         onFailure: suspend () -> Unit,

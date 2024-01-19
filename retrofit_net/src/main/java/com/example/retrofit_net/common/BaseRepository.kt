@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 
-abstract class BaseRepository {
+open class BaseRepository {
 
     suspend fun <T> requestResult(requestCall: suspend () -> BaseResult<T>?): T? {
         val result = withContext(Dispatchers.IO) {

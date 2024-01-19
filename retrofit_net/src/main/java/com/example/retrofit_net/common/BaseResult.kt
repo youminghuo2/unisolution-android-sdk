@@ -1,6 +1,6 @@
 package com.example.retrofit_net.common
 
-abstract class BaseResult<T>(
+open class BaseResult<T>(
     val data: T?,
     val code: String,
     val subCode: String,
