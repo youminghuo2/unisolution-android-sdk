@@ -17,6 +17,9 @@ object HttpManager {
 
     var token=""
 
+//    /**
+//     * 适用于单个共同头部地址
+//     */
 //    private val mRetrofit by lazy {
 //
 //        Retrofit.Builder()
@@ -62,7 +65,9 @@ object HttpManager {
 
     fun <T> create(baseUrl: String, token: String,service: Class<T>): T {
         setBase(baseUrl,token)
+        //单个地址，上文用by lazy
 //        return  mRetrofit.create(service)
+        //多个地址写法
         val mRetrofit = RetrofitFactory.createRetrofit(baseUrl, token)
         return mRetrofit.create(service)
     }

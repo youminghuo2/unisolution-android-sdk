@@ -8,13 +8,19 @@ import com.dylanc.longan.logDebug
 
 class Application: Application() {
 
+    /**
+     * 全局监听，项目内跨进程通信统一会以EventBus传递
+     * 并且在此处监听
+     */
     override fun onCreate() {
         super.onCreate()
 
         registerActivityLifecycleCallbacks(object :Application.ActivityLifecycleCallbacks{
             override fun onActivityCreated(p0: Activity, p1: Bundle?) {
                 Logger<Application>().logDebug("onActivityCreated")
-                GlobalEventBusSubscriber.start()
+                if (!GlobalEventBusSubscriber.isRegisitener()){
+                    GlobalEventBusSubscriber.start()
+                }
             }
 
             override fun onActivityStarted(p0: Activity) {
@@ -39,6 +45,7 @@ class Application: Application() {
 
             override fun onActivityDestroyed(p0: Activity) {
                 Logger<Application>().logDebug("onActivityDestroyed")
+                GlobalEventBusSubscriber.stop()
             }
 
         })

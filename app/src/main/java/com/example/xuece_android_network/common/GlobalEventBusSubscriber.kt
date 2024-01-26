@@ -84,4 +84,9 @@ object GlobalEventBusSubscriber {
             CommonUtils.clearDataStore(application.applicationContext)
         }
     }
+
+    //判断是否已经创建
+    fun isRegisitener():Boolean{
+        return EventBus.getDefault().isRegistered(this)
+    }
 }

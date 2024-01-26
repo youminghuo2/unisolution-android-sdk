@@ -54,6 +54,7 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
     }
 
     override fun initData() {
+        //测试接口
         viewModel.getTermInfo(21)
     }
 
@@ -88,7 +89,7 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
 //            initData()
 
             /**
-             * 测试权限说明，多权限申请代码
+             * 测试权限说明，多权限申请 案例
              */
             val permissionList= listOf(
                 PermissionListEntity(listOf(Manifest.permission.BLUETOOTH_SCAN,Manifest.permission.BLUETOOTH_ADVERTISE,Manifest.permission.BLUETOOTH_CONNECT) ,PermissionEntity("蓝牙权限","当您在我们的产品中使蓝牙")),
@@ -115,6 +116,9 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
         }
     }
 
+    /**
+     * 回调处监听，ActivityResultAPI
+     */
     private val multiPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
                 it ->

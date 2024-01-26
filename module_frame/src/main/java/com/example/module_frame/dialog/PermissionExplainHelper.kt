@@ -4,6 +4,9 @@ import androidx.fragment.app.FragmentManager
 import com.example.module_frame.dialog.builder.PermissionExplainDialog
 import com.example.module_frame.entity.PermissionEntity
 
+/**
+ * 权限说明
+ */
 object PermissionExplainHelper {
     private var dialog: PermissionExplainDialog? = null
 
