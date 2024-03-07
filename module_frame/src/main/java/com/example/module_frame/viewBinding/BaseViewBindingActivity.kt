@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.viewbinding.ViewBinding
 import com.example.module_frame.dialog.builder.LoadingDialogFragment
 import com.example.module_frame.extend.saveAs
@@ -23,7 +24,11 @@ abstract class BaseViewBindingActivity<VB : ViewBinding> : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+//        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        //透明状态栏
+        val controller =WindowCompat.getInsetsController(window,window.decorView);
+        controller.isAppearanceLightStatusBars=true
+
         setContentView(binding.root)
         ActivityCollector.addActivity(this)
         initView()
