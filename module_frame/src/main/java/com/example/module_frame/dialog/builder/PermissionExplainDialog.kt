@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
+import android.os.Build.VERSION
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -43,7 +44,7 @@ class PermissionExplainDialog : DialogFragment() {
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -54,11 +55,15 @@ class PermissionExplainDialog : DialogFragment() {
             borderWidth = 0.5f
         )
 
-        val dataList = arguments?.getParcelableArrayList(
-            "permission",
-            PermissionEntity::class.java
-        ) as List<PermissionEntity>
-        val adapter = PermissionExplainAdapter(requireContext(), dataList)
+        val dataList =
+            if (VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
+                arguments?.getParcelableArrayList(
+                    "permission",
+                    PermissionEntity::class.java ) as List<PermissionEntity>
+            }else{
+                arguments?.getParcelableArrayList<PermissionEntity>("permission")
+            }
+        val adapter = dataList?.let { PermissionExplainAdapter(requireContext(), it) }
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
         binding.recyclerView.adapter = adapter
     }
