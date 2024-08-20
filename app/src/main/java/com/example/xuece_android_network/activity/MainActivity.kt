@@ -31,9 +31,13 @@ import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.example.xuece_android_network.common.ComDaraStore
 import com.example.module_frame.utils.CommonUtils
 import com.example.module_frame.utils.CommonUtils.processPermissions
+import com.example.module_frame.utils.dataStore
 import com.example.xuece_android_network.common.TagData
 import com.example.xuece_android_network.databinding.ActivityMainBinding
 import com.example.xuece_android_network.viewModel.UserCenterViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.File.separator
 
@@ -45,11 +49,7 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
     private var dialogMsg=""
 
     override fun initView() {
-        //测试dataStore代码
-//        lifecycleScope.launch {
-//            val key = stringPreferencesKey(ComDaraStore.server_token)
-//            CommonUtils.editDataStore(context, key, "36288cd4-7997-4cad-b204-0757f91eb6ec")
-//        }
+
 
     }
 
@@ -62,32 +62,66 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
         viewModel.termList.observe(lifecycleOwner) {
             Logger(TagData.MainActivity).logDebug(it.toString())
 
-//            /**
-//             * 测试全局单例dialog代码
-//             */
-//            val handler = Handler(Looper.getMainLooper())
-//            val runnable = object : Runnable {
-//                override fun run() {
-//                    val dialogBuilder = DialogManager.getDialog(this@MainActivity){
-//
-//                    }
-//                    if (dialogBuilder.isDialogShowing() != true) {
-//                        dialogBuilder.show()
-//                    }
-//
-//                    handler.postDelayed(this, 1000)
-//                }
-//            }
-//            handler.postDelayed(runnable, 5000)
 
+            /**
+             * 测试全局单例dialog代码
+             */
+            val handler = Handler(Looper.getMainLooper())
+            val runnable = object : Runnable {
+                override fun run() {
+                    val dialogBuilder = DialogManager.getDialog(this@MainActivity){
+
+                    }
+                    if (dialogBuilder.isDialogShowing() != true) {
+                        dialogBuilder.show()
+                    }
+
+                    handler.postDelayed(this, 1000)
+                }
+            }
+            handler.postDelayed(runnable, 5000)
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun initClick() {
-        binding.tvClick.setOnClickListener {
-//            initData()
+        /**
+         *dataStore存储代码
+         */
+        val key = stringPreferencesKey(ComDaraStore.server_token)
 
+        //存储dataStore
+        binding.dataStoreSaveBtn.setOnClickListener {
+            lifecycleScope.launch {
+                CommonUtils.editDataStore(context, key, "36288cd4-7997-4cad-b204-0757f91eb6ec")
+            }
+        }
+
+        //读取dataStore
+        binding.dataStoreReadBtn.setOnClickListener {
+            val usertypeCodeFlow: Flow<String> =
+                context.dataStore.data.map { preferences ->
+                    preferences[key] ?: ""
+                }
+
+            lifecycleScope.launch {
+                usertypeCodeFlow.collect{token->
+                    binding.dataStoreTv.text=token
+                }
+            }
+        }
+
+        /**
+         *   全局单例弹窗
+         */
+        binding.singleDialogBtn.setOnClickListener {
+            initData()
+        }
+
+        /**
+         * 申请权限
+         */
+        binding.permissionBtn.setOnClickListener {
             /**
              * 测试权限说明，多权限申请 案例
              */
@@ -100,21 +134,24 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
             val multipleList=CommonUtils.checkSelfPermissionMultiple(context,
                 permissionList)
 
-            if (multipleList.isNotEmpty()){
+            if (multipleList.isNotEmpty()) {
                 val (explainList, requireList) = processPermissions(multipleList)
 
-                val msg=explainList.joinToString(separator=","){it.title}
-                dialogMsg="请在设置中开启${msg}，以正常使用App功能"
+                val msg = explainList.joinToString(separator = ",") { it.title }
+                dialogMsg = "请在设置中开启${msg}，以正常使用App功能"
 
-                showExplain(supportFragmentManager,explainList)
+                showExplain(supportFragmentManager, explainList)
 
                 multiPermissionLauncher.launch(
                     requireList.toTypedArray()
                 )
-
             }
         }
+
+
     }
+
+
 
     /**
      * 回调处监听，ActivityResultAPI
