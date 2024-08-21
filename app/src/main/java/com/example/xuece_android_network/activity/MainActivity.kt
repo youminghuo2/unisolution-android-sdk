@@ -2,10 +2,12 @@ package com.example.xuece_android_network.activity
 
 import android.Manifest
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
@@ -21,6 +23,7 @@ import com.dylanc.longan.context
 import com.dylanc.longan.launchAppSettings
 import com.dylanc.longan.lifecycleOwner
 import com.dylanc.longan.logDebug
+import com.dylanc.longan.startActivity
 import com.example.module_frame.dialog.DialogManager
 import com.example.module_frame.dialog.PermissionExplainHelper.dismissExplain
 import com.example.module_frame.dialog.PermissionExplainHelper.showExplain
@@ -52,9 +55,9 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
 
 
     private var fileName = ""
+    private lateinit var photoURI: Uri
 
     override fun initView() {
-
 
     }
 
@@ -66,7 +69,6 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
     override fun registerObserver() {
         viewModel.termList.observe(lifecycleOwner) {
             Logger(TagData.MainActivity).logDebug(it.toString())
-
 
             /**
              * 测试全局单例dialog代码
@@ -146,7 +148,13 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION
                     ), PermissionEntity("地理位置权限", "当您在我们的产品中使用地理位置权限")
+                ),
+                PermissionListEntity(
+                    listOf(
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                    ), PermissionEntity("存储权限", "当您在我们的产品中使用存储权限")
                 )
+
             )
 
             val multipleList = CommonUtils.checkSelfPermissionMultiple(
@@ -188,27 +196,59 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
         }
 
         /**
-         *跳转系统拍照，假设已经授予了camera
+         *跳转自定义拍照，假设已经授予了camera
          */
         binding.cameraBtn.setOnClickListener {
-            Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent->
-                try {
-                    takePictureIntent.resolveActivity(packageManager)?.also {
-                         val photoURI = createTempPictureUri()
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                        takePhotoLauncher.launch(photoURI)
-                    }
+            startActivity<PreviewViewActivity>()
+            finish()
+        }
 
-                }catch (e:Exception){
-                    Logger(TagData.MainActivity).logDebug("error ---> ${e.message}")
+        /**
+         *跳转系统拍照，假设已经授予了camera
+         */
+       binding.cameraSystemBtn.setOnClickListener{
+           Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent->
+               try {
+                   takePictureIntent.resolveActivity(packageManager)?.also {
+                        photoURI = createTempPictureUri()
+                       takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                       takePhotoLauncher.launch(photoURI)
+                   }
+
+               }catch (e:Exception){
+                   Logger(TagData.MainActivity).logDebug("error ---> ${e.message}")
+               }
+           }
+       }
+    }
+
+    //跳转拍照
+    private val takePhotoLauncher=registerForActivityResult(ActivityResultContracts.TakePicture()) {isSaved ->
+        if (isSaved ){
+            //保存成功
+            Toast.makeText(context,"我收到了系统的消息，可以开始旋转了",Toast.LENGTH_SHORT).show()
+            saveImageToGallery(photoURI)
+        }
+    }
+
+    private fun saveImageToGallery(imageUri: Uri) {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+        }
+
+        contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)?.let { uri ->
+            contentResolver.openOutputStream(uri)?.use { outputStream ->
+                contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                    inputStream.copyTo(outputStream)
                 }
             }
         }
 
-
-
+        // 广播媒体扫描
+        sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, imageUri))
     }
-
 
     /**
      * 回调处监听，ActivityResultAPI
@@ -253,42 +293,13 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
             }
         }
 
-   //跳转拍照
-   private val takePhotoLauncher=registerForActivityResult(ActivityResultContracts.TakePicture()) {isSaved ->
-       if (isSaved ){
-           //保存成功
-           val filepath: String = PhotoBitmapUtils.amendRotatePhoto(fileName, this)
 
+    fun createTempPictureUri(fileName: String = "picture_${System.currentTimeMillis()}", fileExtension: String = ".png"): Uri {
+        val tempFile = File.createTempFile(fileName, fileExtension, cacheDir).apply { createNewFile()}
+        this.fileName=fileName
 
-       }
-
-   }
-//           result ->
-//       if (result.resultCode==Activity.RESULT_OK){
-//       //要在这里面进行
-//       result.data!!.data?.let{ uri->
-//           //选择显示的图片
-//           val bitmap=getBitMapFromUri(uri)
-//           binding.pictureImg.setImageBitmap(bitmap)
-//       }
-//    =registerForActivityResult(ActivityResultContracts.TakePicture()){isBoolean->{
-//
-//   }
-
-//    private val takePhotoLauncher = registerForActivityResult<Uri, Boolean>(
-//           TakePicture(),
-//           object : ActivityResultCallback<Boolean?> {
-//               fun onActivityResult(result: Boolean) {
-//
-//                   // do what you need with the uri here ...
-//               }
-//           })
-fun createTempPictureUri(fileName: String = "picture_${System.currentTimeMillis()}", fileExtension: String = ".png"): Uri {
-    val tempFile = File.createTempFile(fileName, fileExtension, cacheDir).apply { createNewFile()}
-    this.fileName=fileName
-
-    return FileProvider.getUriForFile(this, "com.example.xuece_android_network.fileprovider", tempFile)
-}
+        return FileProvider.getUriForFile(this, "com.example.xuece_android_network.fileprovider", tempFile)
+    }
 
    }
 
