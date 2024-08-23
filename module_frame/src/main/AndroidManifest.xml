@@ -4,10 +4,6 @@
     <application>
 
         <activity
-            android:name="com.example.camera.PhotoPreviewActivity"
-            android:theme="@style/Theme.Xuece_android_network"
-            android:exported="false" />
-        <activity
             android:name="com.example.camera.PreviewViewActivity"
             android:theme="@style/Theme.Xuece_android_network"
             android:exported="false" />

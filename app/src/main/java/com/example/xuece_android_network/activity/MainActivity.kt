@@ -10,20 +10,21 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import coil.load
 import com.dylanc.longan.Logger
 import com.dylanc.longan.context
 import com.dylanc.longan.launchAppSettings
 import com.dylanc.longan.lifecycleOwner
 import com.dylanc.longan.logDebug
-import com.dylanc.longan.startActivity
-import com.example.camera.PreviewViewActivity
 import com.example.module_frame.dialog.DialogManager
 import com.example.module_frame.dialog.PermissionExplainHelper.dismissExplain
 import com.example.module_frame.dialog.PermissionExplainHelper.showExplain
@@ -31,6 +32,8 @@ import com.example.module_frame.dialog.builder.FlutterDialogFragment
 import com.example.module_frame.dialog.builder.SingleDialogBuilder
 import com.example.module_frame.entity.PermissionEntity
 import com.example.module_frame.entity.PermissionListEntity
+import com.example.module_frame.extend.CameraHelper
+import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.utils.CommonUtils
 import com.example.module_frame.utils.CommonUtils.processPermissions
 import com.example.module_frame.utils.dataStore
@@ -43,16 +46,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.Serializable
 
 
 class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
 
     private val viewModel by viewModels<UserCenterViewModel>()
     private lateinit var dialogBuilder: SingleDialogBuilder
-
     private var dialogMsg = ""
-
-
     private var fileName = ""
     private lateinit var photoURI: Uri
 
@@ -150,7 +151,8 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
                 ),
                 PermissionListEntity(
                     listOf(
-                        Manifest.permission.READ_MEDIA_IMAGES,
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                        Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE,
                     ), PermissionEntity("存储权限", "当您在我们的产品中使用存储权限")
                 )
 
@@ -198,37 +200,38 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
          *跳转自定义拍照，假设已经授予了camera
          */
         binding.cameraBtn.setOnClickListener {
-            startActivity<PreviewViewActivity>()
-            finish()
+            CameraHelper.startPreviewActivity(context, MyPreviewCallback())
         }
 
         /**
          *跳转系统拍照，假设已经授予了camera
          */
-       binding.cameraSystemBtn.setOnClickListener{
-           Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent->
-               try {
-                   takePictureIntent.resolveActivity(packageManager)?.also {
+        binding.cameraSystemBtn.setOnClickListener {
+            Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+                try {
+                    takePictureIntent.resolveActivity(packageManager)?.also {
                         photoURI = createTempPictureUri()
-                       takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                       takePhotoLauncher.launch(photoURI)
-                   }
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                        takePhotoLauncher.launch(photoURI)
+                    }
 
-               }catch (e:Exception){
-                   Logger(TagData.MainActivity).logDebug("error ---> ${e.message}")
-               }
-           }
-       }
+                } catch (e: Exception) {
+                    Logger(TagData.MainActivity).logDebug("error ---> ${e.message}")
+                }
+            }
+        }
     }
 
     //跳转拍照
-    private val takePhotoLauncher=registerForActivityResult(ActivityResultContracts.TakePicture()) {isSaved ->
-        if (isSaved ){
-            //保存成功
-            Toast.makeText(context,"我收到了系统的消息，可以开始旋转了",Toast.LENGTH_SHORT).show()
-            saveImageToGallery(photoURI)
+    private val takePhotoLauncher =
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
+            if (isSaved) {
+                //保存成功
+                Toast.makeText(context, "我收到了系统的消息，可以开始旋转了", Toast.LENGTH_SHORT)
+                    .show()
+                saveImageToGallery(photoURI)
+            }
         }
-    }
 
     private fun saveImageToGallery(imageUri: Uri) {
         val contentValues = ContentValues().apply {
@@ -237,13 +240,14 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
             put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
         }
 
-        contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)?.let { uri ->
-            contentResolver.openOutputStream(uri)?.use { outputStream ->
-                contentResolver.openInputStream(imageUri)?.use { inputStream ->
-                    inputStream.copyTo(outputStream)
+        contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            ?.let { uri ->
+                contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
                 }
             }
-        }
 
         // 广播媒体扫描
         sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, imageUri))
@@ -293,13 +297,30 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
         }
 
 
-    fun createTempPictureUri(fileName: String = "picture_${System.currentTimeMillis()}", fileExtension: String = ".png"): Uri {
-        val tempFile = File.createTempFile(fileName, fileExtension, cacheDir).apply { createNewFile()}
-        this.fileName=fileName
+    fun createTempPictureUri(
+        fileName: String = "picture_${System.currentTimeMillis()}",
+        fileExtension: String = ".png"
+    ): Uri {
+        val tempFile =
+            File.createTempFile(fileName, fileExtension, cacheDir).apply { createNewFile() }
+        this.fileName = fileName
 
-        return FileProvider.getUriForFile(this, "com.example.xuece_android_network.fileprovider", tempFile)
+        return FileProvider.getUriForFile(
+            this,
+            "com.example.xuece_android_network.fileprovider",
+            tempFile
+        )
     }
 
-   }
+    companion object {
+        class MyPreviewCallback: PreviewCallback, Serializable {
+            override fun onPreviewFinished(url: String) {
+                // 处理回调，例如使用 Log 打印 URL
+                Log.d("MyPreviewCallback", "Received image URL: $url")
+
+            }
+        }
+    }
+}
 
 

@@ -8,9 +8,9 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:padding="10dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_height="wrap_content">
+        android:padding="10dp">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -30,11 +30,11 @@
                 android:text="dataStore存储" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:layout_marginStart="10dp"
                 android:id="@+id/dataStore_tv"
-                android:text="默认值是:"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="默认值是:" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -59,12 +59,26 @@
             android:text="申请单个权限，相机" />
 
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/camera_btn"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center_vertical"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="自定义camera" />
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/camera_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="自定义camera" />
+
+            <ImageView
+                android:id="@+id/camera_img"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="50dp" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -74,8 +88,8 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/cameraSystem_btn"
                 android:layout_width="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="调用系统camera" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
