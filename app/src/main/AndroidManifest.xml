@@ -42,9 +42,7 @@
         <activity
             android:name="com.example.camera.PhotoPreviewActivity"
             android:exported="false" />
-        <activity
-            android:name="com.example.camera.PreviewViewActivity"
-            android:exported="false" />
+
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
