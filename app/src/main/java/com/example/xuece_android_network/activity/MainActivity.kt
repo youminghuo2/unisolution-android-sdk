@@ -3,7 +3,6 @@ package com.example.xuece_android_network.activity
 import android.Manifest
 import android.app.Dialog
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -24,6 +23,7 @@ import com.dylanc.longan.launchAppSettings
 import com.dylanc.longan.lifecycleOwner
 import com.dylanc.longan.logDebug
 import com.dylanc.longan.startActivity
+import com.example.camera.PreviewViewActivity
 import com.example.module_frame.dialog.DialogManager
 import com.example.module_frame.dialog.PermissionExplainHelper.dismissExplain
 import com.example.module_frame.dialog.PermissionExplainHelper.showExplain
@@ -38,7 +38,6 @@ import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.example.xuece_android_network.common.ComDaraStore
 import com.example.xuece_android_network.common.TagData
 import com.example.xuece_android_network.databinding.ActivityMainBinding
-import com.example.xuece_android_network.utils.PhotoBitmapUtils
 import com.example.xuece_android_network.viewModel.UserCenterViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

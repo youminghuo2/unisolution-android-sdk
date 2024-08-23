@@ -1,7 +1,6 @@
-package com.example.xuece_android_network.activity
+package com.example.camera
 
 import android.content.ContentValues
-import android.content.Intent
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
@@ -15,13 +14,12 @@ import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import com.dylanc.longan.Logger
-import com.dylanc.longan.context
 import com.dylanc.longan.logDebug
+import com.example.module_frame.databinding.ActivityPreviewViewBinding
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
-import com.example.xuece_android_network.common.TagData
-import com.example.xuece_android_network.databinding.ActivityPreviewViewBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
+
 
 class PreviewViewActivity  : BaseViewBindingActivity<ActivityPreviewViewBinding>(){
     private var imageCapture: ImageCapture? = null
@@ -65,7 +63,7 @@ class PreviewViewActivity  : BaseViewBindingActivity<ActivityPreviewViewBinding>
                 )
 
             } catch(exc: Exception) {
-                Logger(TagData.MainActivity).logDebug("Use case binding failed${exc}")
+                Logger("PreviewActivity").logDebug("Use case binding failed${exc}")
             }
 
         }, ContextCompat.getMainExecutor(this))
