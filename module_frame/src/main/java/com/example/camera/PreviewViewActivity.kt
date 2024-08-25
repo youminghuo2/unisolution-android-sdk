@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
@@ -22,6 +23,7 @@ import com.dylanc.longan.logDebug
 import com.example.module_frame.databinding.ActivityPreviewViewBinding
 import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.UUID
@@ -137,22 +139,28 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         // Create time stamped name and MediaStore entry.
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())+"_"+ UUID.randomUUID().toString()
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
-            }
-        }
 
+        //存在私有目录
+        val fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val photoFile = File(fileDir, name)
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+        //存在共有目录
+//        val contentValues = ContentValues().apply {
+//            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+//            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+//            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+//                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+//            }
+//        }
         // Create output options object which contains file + metadata
-        val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(
-                contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues
-            )
-            .build()
+//        val outputOptions = ImageCapture.OutputFileOptions
+//            .Builder(
+//                contentResolver,
+//                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                contentValues
+//            )
+//            .build()
 
         // Set up image capture listener, which is triggered after photo has
         // been taken
