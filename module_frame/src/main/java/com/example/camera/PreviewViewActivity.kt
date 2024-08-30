@@ -49,7 +49,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     private var callback: PreviewCallback? = null
     private var mFacingFront = false  //是否是前置摄像头
 
-    private val REQUEST_CROP_CODE = 2
+   private var authorities=""
 
     override fun initView() {
         startCamera()
@@ -62,6 +62,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
             @Suppress("DEPRECATION")
             intent.getSerializableExtra("callback") as? PreviewCallback
         }
+        authorities= intent.getStringExtra("authorities").toString()
     }
 
     private fun startCamera() {
@@ -258,7 +259,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         val contentUri = FileProvider.getUriForFile(
             this,
-            "com.example.xuece_android_network.fileprovider",
+            authorities,
             File(uri.path!!) // 将 Uri 转换为 File 对象
         )
 

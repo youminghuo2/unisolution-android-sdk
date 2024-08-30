@@ -200,7 +200,7 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
          *跳转自定义拍照，假设已经授予了camera
          */
         binding.cameraBtn.setOnClickListener {
-            CameraHelper.startPreviewActivity(context, MyPreviewCallback())
+            CameraHelper.startPreviewActivity(context, "com.example.xuece_android_network.fileprovider",MyPreviewCallback())
         }
 
         /**

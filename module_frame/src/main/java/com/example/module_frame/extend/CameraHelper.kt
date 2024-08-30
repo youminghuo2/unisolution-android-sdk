@@ -9,10 +9,12 @@ import java.io.Serializable
 
 
 object CameraHelper {
-    fun  startPreviewActivity(context: Context, callback: PreviewCallback? = null){
+    fun  startPreviewActivity(context: Context,providerAuthorities:String, callback: PreviewCallback? = null){
         val intent = Intent(context, PreviewViewActivity::class.java)
         // 将回调对象存储在 Intent 中
+
         intent.putExtra("callback", callback)
+        intent.putExtra("authorities",providerAuthorities)
         context.startActivity(intent)
     }
 
