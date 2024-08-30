@@ -36,6 +36,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     private lateinit var cameraExecutor: ExecutorService
     private var mSavedUri: Uri? = null
     private var callback: PreviewCallback? = null
+    private var mFacingFront = false
 
     override fun initView() {
         startCamera()
@@ -51,6 +52,14 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     }
 
     private fun startCamera() {
+        switchCamera(false)
+    }
+
+
+    private fun switchCamera(switch:Boolean){
+        if (switch){
+            mFacingFront = !mFacingFront
+        }
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener({
@@ -67,7 +76,10 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
             imageCapture = ImageCapture.Builder().build()
 
             // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            val cameraSelector = CameraSelector.Builder()
+                .requireLensFacing(if (mFacingFront) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK)
+                .build()
+
 
             try {
                 // Unbind use cases before rebinding
@@ -77,7 +89,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 //                cameraProvider.bindToLifecycle(
 //                    lifecycleOwner, cameraSelector, preview)
                 cameraProvider.bindToLifecycle(
-                    this, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture
+                    this, cameraSelector, preview, imageCapture
                 )
 
             } catch (exc: Exception) {
@@ -88,6 +100,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 
 
     }
+
 
     override fun initClick() {
         //拍摄
@@ -129,6 +142,11 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
                 v.performClick()
             }
             true
+        }
+
+        //旋转摄像头
+        binding.switchCameraImg.setOnClickListener {
+            switchCamera(true)
         }
     }
 

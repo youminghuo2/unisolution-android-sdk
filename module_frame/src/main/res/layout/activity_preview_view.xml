@@ -25,12 +25,25 @@
 
     </com.google.android.material.imageview.ShapeableImageView>
 
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/switch_camera_img"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:src="@drawable/camera_switch"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/take_photo_img"
+        app:layout_constraintTop_toTopOf="@id/take_photo_img"
+        app:layout_constraintRight_toRightOf="parent">
+
+    </com.google.android.material.imageview.ShapeableImageView>
+
     <androidx.constraintlayout.widget.Group
         android:id="@+id/cameraGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:constraint_referenced_ids="preview_img,take_photo_img" />
+        app:constraint_referenced_ids="preview_img,take_photo_img,switch_camera_img" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/close_img"
@@ -68,7 +81,7 @@
         android:visibility="gone"
         app:constraint_referenced_ids="photos_img,save_img" />
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/focus_icon"
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -76,5 +89,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:src="@drawable/focus_img"
         android:visibility="gone" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
