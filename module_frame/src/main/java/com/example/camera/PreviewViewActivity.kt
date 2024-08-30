@@ -2,6 +2,8 @@ package com.example.camera
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -10,20 +12,29 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import coil.load
 import com.dylanc.longan.Logger
+import com.dylanc.longan.context
 import com.dylanc.longan.logDebug
 import com.example.module_frame.databinding.ActivityPreviewViewBinding
 import com.example.module_frame.interfaces.PreviewCallback
+import com.example.module_frame.utils.CropUtils
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
+
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.UUID
@@ -36,7 +47,9 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     private lateinit var cameraExecutor: ExecutorService
     private var mSavedUri: Uri? = null
     private var callback: PreviewCallback? = null
-    private var mFacingFront = false
+    private var mFacingFront = false  //是否是前置摄像头
+
+    private val REQUEST_CROP_CODE = 2
 
     override fun initView() {
         startCamera()
@@ -119,16 +132,16 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         }
 
         //保存
-        binding.saveImg.setOnClickListener {
-            if (mSavedUri != null) {
-                getRealPathFromUri(this, mSavedUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
-                finish()
-            }
-        }
+//        binding.saveImg.setOnClickListener {
+//            if (mSavedUri != null) {
+//                getRealPathFromUri(this, mSavedUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
+//                finish()
+//            }
+//        }
 
         //聚焦
         binding.root.rootView.setOnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
+            if (event.action == MotionEvent.ACTION_DOWN && binding.cameraGroup.isVisible) {
                 val x = event.x.toInt()
                 val y = event.y.toInt()
 
@@ -158,12 +171,12 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())+"_"+ UUID.randomUUID().toString()
 
-        //存在私有目录
+//        //存在私有目录
         val fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val photoFile = File(fileDir, name)
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        //存在共有目录
+//        存在共有目录
 //        val contentValues = ContentValues().apply {
 //            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
 //            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
@@ -171,7 +184,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 //                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
 //            }
 //        }
-        // Create output options object which contains file + metadata
+//         Create output options object which contains file + metadata
 //        val outputOptions = ImageCapture.OutputFileOptions
 //            .Builder(
 //                contentResolver,
@@ -194,13 +207,14 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
                 override fun
                         onImageSaved(output: ImageCapture.OutputFileResults) {
                     mSavedUri = output.savedUri
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-//                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+
                     Logger("PreviewActivity").logDebug(output.savedUri)
                     binding.cameraGroup.isVisible = false
                     binding.photosGroup.isVisible = true
-                    binding.photosImg.load(output.savedUri)
-                    Log.d(TAG, msg)
+//                    binding.photosImg.load(output.savedUri)   //加载图片
+                    startPhotoZoom(output.savedUri!!)
+
+
                 }
             }
         )
@@ -231,4 +245,103 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
 
     }
+
+
+
+    private var uriClipUri: Uri? = null //裁剪图片的的地址，最终加载它
+    /**
+     * 图片裁剪的方法
+     * @param uri
+     */
+    private fun startPhotoZoom(uri: Uri) {
+        val intent = Intent("com.android.camera.action.CROP")//com.android.camera.action.CROP，这个action是调用系统自带的图片裁切功能
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val contentUri = FileProvider.getUriForFile(
+            this,
+            "com.example.xuece_android_network.fileprovider",
+            File(uri.path!!) // 将 Uri 转换为 File 对象
+        )
+
+        intent.setDataAndType(contentUri, "image/*") //裁剪的图片uri和图片类型
+        intent.putExtra("crop", "true") //设置允许裁剪，如果不设置，就会跳过裁剪的过程，还可以设置putExtra("crop", "circle")
+
+        intent.putExtra("scale", true)
+        // 裁剪框的比例（根据需要显示的图片比例进行设置）
+        if (Build.MANUFACTURER.contains("HUAWEI")) {
+//            //硬件厂商为华为的，默认是圆形裁剪框，这里让它无法成圆形
+//            intent.putExtra("aspectX", 9999)
+//            intent.putExtra("aspectY", 9998)
+            // 移除 aspectX 和 aspectY 参数，允许自由裁剪
+            intent.removeExtra("aspectX")
+            intent.removeExtra("aspectY")
+        } else {
+            //其他手机一般默认为方形。
+            intent.putExtra("aspectX", 1)
+            intent.putExtra("aspectY", 1)
+        }
+
+        val cropFile = createFile("Crop")
+        uriClipUri = Uri.fromFile(cropFile)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uriClipUri)
+
+        // 设置图片的输出格式
+        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString())
+
+        // return-data=true传递的为缩略图，小米手机默认传递大图， Android 11以上设置为true会闪退
+        intent.putExtra("return-data", false)
+
+        cropImageLauncher.launch(intent)
+    }
+
+    private var cropImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // 裁剪完成后的操作
+                if (uriClipUri != null){
+                    Log.d(TAG, "Photo capture failed:$uriClipUri")
+                    getRealPathFromUri(this, uriClipUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
+                    finish()
+                }
+            else  {
+                // 裁剪被取消，处理取消情况
+                // 例如，显示一个 Toast 消息或者重新启动图片选择流程
+                    initConfig()
+            }
+        }else{
+           //裁剪取消的情况下
+            initConfig()
+        }
+    }
+
+
+    private fun initConfig(){
+        binding.cameraGroup.isVisible = true
+        binding.photosGroup.isVisible = false
+        switchCamera(false)
+
+    }
+
+
+    private fun createFile(type: String): File {
+        // 在相册创建一个临时文件
+        val picFile = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            "${type}_${System.currentTimeMillis()}.jpg")
+        try {
+            if (picFile.exists()) {
+                picFile.delete()
+            }
+            picFile.createNewFile()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        // 临时文件，后面会加long型随机数
+//        return File.createTempFile(
+//            type,
+//            ".jpg",
+//            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+//        )
+
+        return picFile
+    }
+
 }

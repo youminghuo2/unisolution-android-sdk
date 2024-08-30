@@ -39,9 +39,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Xuece_android_network"
         tools:targetApi="31">
-        <activity
-            android:name="com.example.camera.PhotoPreviewActivity"
-            android:exported="false" />
 
         <activity
             android:name=".activity.MainActivity"

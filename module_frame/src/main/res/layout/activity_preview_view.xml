@@ -79,7 +79,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:constraint_referenced_ids="photos_img,save_img" />
+        app:constraint_referenced_ids="photos_img" />
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/focus_icon"
