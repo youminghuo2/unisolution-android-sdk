@@ -1,9 +1,9 @@
 package com.example.camera
 
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -12,15 +12,12 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
@@ -30,10 +27,10 @@ import com.dylanc.longan.context
 import com.dylanc.longan.logDebug
 import com.example.module_frame.databinding.ActivityPreviewViewBinding
 import com.example.module_frame.interfaces.PreviewCallback
-import com.example.module_frame.utils.CropUtils
+import com.example.module_frame.utils.CropFileUtils
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
-
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -213,9 +210,24 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
                     binding.cameraGroup.isVisible = false
                     binding.photosGroup.isVisible = true
 //                    binding.photosImg.load(output.savedUri)   //加载图片
-                    startPhotoZoom(output.savedUri!!)
+                    val imagePath: String = getRealPathFromUri(context, output.savedUri!!).toString()
+                    if (imagePath != null) {
+                        val degree =CropFileUtils.readPictureDegree(imagePath)
+                        if (degree == 0) {
+                            startPhotoZoom(output.savedUri!!)
+                        }else{
+                            val bitmap = BitmapFactory.decodeFile(imagePath)
+                            val rotatedBitmap: Bitmap = CropFileUtils.rotaingImageView(degree, bitmap)
+                            val newImagePath: String = saveBitmapToFile(rotatedBitmap)
+                            val file = File(newImagePath)
+                            val newImageUri = Uri.fromFile(file)
+                            startPhotoZoom(newImageUri)
+                        }
 
-
+                    } else {
+                        // 处理路径获取失败的情况
+                        startPhotoZoom(output.savedUri!!)
+                    }
                 }
             }
         )
@@ -281,8 +293,19 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
             intent.putExtra("aspectY", 1)
         }
 
-        val cropFile = createFile("Crop")
-        uriClipUri = Uri.fromFile(cropFile)
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            val cropFile = CropFileUtils.createImageFile(this, true)
+            //设置裁剪的图片地址Uri
+            uriClipUri = CropFileUtils.uri
+        }else{
+            val cropFile = createFile("Crop")
+            uriClipUri = Uri.fromFile(cropFile)
+        }
+
+
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uriClipUri)
 
         // 设置图片的输出格式
@@ -299,8 +322,9 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
             // 裁剪完成后的操作
                 if (uriClipUri != null){
                     Log.d(TAG, "Photo capture failed:$uriClipUri")
-                    getRealPathFromUri(this, uriClipUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
-                    finish()
+//                    getRealPathFromUri(this, uriClipUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
+//                    finish()
+                    binding.photosImg.load(uriClipUri)
                 }
             else  {
                 // 裁剪被取消，处理取消情况
@@ -343,6 +367,20 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 //        )
 
         return picFile
+    }
+
+    private fun saveBitmapToFile(bitmap: Bitmap): String {
+        // 创建文件以保存旋转后的图片
+        val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "rotated_image.jpg")
+        try {
+            val out = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out) // 将Bitmap保存为JPEG格式
+            out.flush()
+            out.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return file.absolutePath // 返回保存后的文件路径
     }
 
 }
