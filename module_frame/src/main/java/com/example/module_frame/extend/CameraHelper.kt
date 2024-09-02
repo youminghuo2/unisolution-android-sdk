@@ -9,14 +9,21 @@ import java.io.Serializable
 
 
 object CameraHelper {
-    fun  startPreviewActivity(context: Context,providerAuthorities:String, callback: PreviewCallback? = null){
-        val intent = Intent(context, PreviewViewActivity::class.java)
-        // 将回调对象存储在 Intent 中
+//    fun  startPreviewActivity(context: Context,providerAuthorities:String, callback: PreviewCallback? = null){
+//        val intent = Intent(context, PreviewViewActivity::class.java)
+//        // 将回调对象存储在 Intent 中
+//
+//        intent.putExtra("callback", callback)
+//        intent.putExtra("authorities",providerAuthorities)
+//        context.startActivity(intent)
+//    }
+    var callback: PreviewCallback? = null
 
-        intent.putExtra("callback", callback)
-        intent.putExtra("authorities",providerAuthorities)
+    fun startPreviewActivity(context: Context, providerAuthorities: String, callback: PreviewCallback? = null) {
+        this.callback = callback
+        val intent = Intent(context, PreviewViewActivity::class.java)
+        intent.putExtra("authorities", providerAuthorities)
         context.startActivity(intent)
     }
-
 }
 

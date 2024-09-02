@@ -26,6 +26,7 @@ import com.dylanc.longan.Logger
 import com.dylanc.longan.context
 import com.dylanc.longan.logDebug
 import com.example.module_frame.databinding.ActivityPreviewViewBinding
+import com.example.module_frame.extend.CameraHelper
 import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.utils.CropFileUtils
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
@@ -52,13 +53,14 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         startCamera()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        // 从 Intent 中获取回调对象并调用回调方法
-        callback = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra("callback", PreviewCallback::class.java) as? PreviewCallback
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getSerializableExtra("callback") as? PreviewCallback
-        }
+//        // 从 Intent 中获取回调对象并调用回调方法
+//        callback = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            intent.getSerializableExtra("callback", PreviewCallback::class.java) as? PreviewCallback
+//        } else {
+//            @Suppress("DEPRECATION")
+//            intent.getSerializableExtra("callback") as? PreviewCallback
+//        }
+        callback= CameraHelper.callback
         authorities= intent.getStringExtra("authorities").toString()
     }
 
@@ -322,9 +324,8 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
             // 裁剪完成后的操作
                 if (uriClipUri != null){
                     Log.d(TAG, "Photo capture failed:$uriClipUri")
-//                    getRealPathFromUri(this, uriClipUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
-//                    finish()
-                    binding.photosImg.load(uriClipUri)
+                    getRealPathFromUri(this, uriClipUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
+                    finish()
                 }
             else  {
                 // 裁剪被取消，处理取消情况
