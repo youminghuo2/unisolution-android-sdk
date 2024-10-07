@@ -132,12 +132,12 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         }
 
         //保存
-//        binding.saveImg.setOnClickListener {
-//            if (mSavedUri != null) {
-//                getRealPathFromUri(this, mSavedUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
-//                finish()
-//            }
-//        }
+        binding.saveImg.setOnClickListener {
+            if (mSavedUri != null) {
+                getRealPathFromUri(this, mSavedUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
+                finish()
+            }
+        }
 
         //聚焦
         binding.root.rootView.setOnTouchListener { v, event ->
@@ -211,25 +211,25 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
                     Logger("PreviewActivity").logDebug(output.savedUri)
                     binding.cameraGroup.isVisible = false
                     binding.photosGroup.isVisible = true
-//                    binding.photosImg.load(output.savedUri)   //加载图片
-                    val imagePath: String = getRealPathFromUri(context, output.savedUri!!).toString()
-                    if (imagePath != null) {
-                        val degree =CropFileUtils.readPictureDegree(imagePath)
-                        if (degree == 0) {
-                            startPhotoZoom(output.savedUri!!)
-                        }else{
-                            val bitmap = BitmapFactory.decodeFile(imagePath)
-                            val rotatedBitmap: Bitmap = CropFileUtils.rotaingImageView(degree, bitmap)
-                            val newImagePath: String = saveBitmapToFile(rotatedBitmap)
-                            val file = File(newImagePath)
-                            val newImageUri = Uri.fromFile(file)
-                            startPhotoZoom(newImageUri)
-                        }
-
-                    } else {
-                        // 处理路径获取失败的情况
-                        startPhotoZoom(output.savedUri!!)
-                    }
+                    binding.photosImg.load(output.savedUri)   //加载图片
+//                    val imagePath: String = getRealPathFromUri(context, output.savedUri!!).toString()
+//                    if (imagePath != null) {
+//                        val degree =CropFileUtils.readPictureDegree(imagePath)
+//                        if (degree == 0) {
+//                            startPhotoZoom(output.savedUri!!)
+//                        }else{
+//                            val bitmap = BitmapFactory.decodeFile(imagePath)
+//                            val rotatedBitmap: Bitmap = CropFileUtils.rotaingImageView(degree, bitmap)
+//                            val newImagePath: String = saveBitmapToFile(rotatedBitmap)
+//                            val file = File(newImagePath)
+//                            val newImageUri = Uri.fromFile(file)
+//                            startPhotoZoom(newImageUri)
+//                        }
+//
+//                    } else {
+//                        // 处理路径获取失败的情况
+//                        startPhotoZoom(output.savedUri!!)
+//                    }
                 }
             }
         )
