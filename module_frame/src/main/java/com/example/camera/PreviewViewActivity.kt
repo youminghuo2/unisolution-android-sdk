@@ -369,7 +369,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
                 val resultUri = UCrop.getOutput(intent)
                 // 处理裁剪结果，比如显示图片或保存图片
                 if (resultUri != null) {
-                    getRealPathFromUri(this, mSavedUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
+                    getRealPathFromUri(this, resultUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
                     finish()
                 }
             }
