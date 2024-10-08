@@ -340,8 +340,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         options.setHideBottomControls(true)
 // 图片格式
         options.setCompressionFormat(Bitmap.CompressFormat.JPEG)
-// 设置图片压缩质量
-        options.setCompressionQuality(100)
+
 // 让用户调整范围
         options.setFreeStyleCropEnabled(true)
 // 设置图片压缩质量
@@ -357,7 +356,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 // 设置源uri及目标uri
         val destinationUri = Uri.fromFile(File(fileDir, "${System.currentTimeMillis()}.jpg"))
         val uCropIntent = UCrop.of(uri, destinationUri)
-            .withMaxResultSize(200, 200)  // 图片大小
+            .withMaxResultSize(1080, 1920)  // 图片大小
             .withOptions(options)        // 传递配置参数
             .getIntent(this)
         uCropLauncher.launch(uCropIntent)
