@@ -47,13 +47,13 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/close_img"
-        android:layout_width="60dp"
-        android:layout_margin="10dp"
-        android:padding="15dp"
+        android:layout_width="70dp"
+        android:layout_margin="15dp"
+        android:padding="20dp"
         android:src="@drawable/camera_back"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_height="60dp">
+        android:layout_height="70dp">
     </com.google.android.material.imageview.ShapeableImageView>
 
     <com.google.android.material.imageview.ShapeableImageView

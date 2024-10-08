@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -20,6 +21,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import coil.load
 import com.dylanc.longan.Logger
@@ -30,6 +32,7 @@ import com.example.module_frame.extend.CameraHelper
 import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.utils.CropFileUtils
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
+import com.yalantis.ucrop.UCrop
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -50,6 +53,11 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
    private var authorities=""
 
     override fun initView() {
+        WindowCompat.setDecorFitsSystemWindows(window, false) // Make content extend into status bar
+        window.statusBarColor = Color.TRANSPARENT
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        insetsController.isAppearanceLightStatusBars = false // Set status bar icons to white (dark background)
+
         startCamera()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
@@ -216,19 +224,22 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
                     if (imagePath != null) {
                         val degree =CropFileUtils.readPictureDegree(imagePath)
                         if (degree == 0) {
-                            startPhotoZoom(output.savedUri!!)
+//                            startPhotoZoom(output.savedUri!!)
+                            startPhotoZoomByCrop(output.savedUri!!)
                         }else{
                             val bitmap = BitmapFactory.decodeFile(imagePath)
                             val rotatedBitmap: Bitmap = CropFileUtils.rotaingImageView(degree, bitmap)
                             val newImagePath: String = saveBitmapToFile(rotatedBitmap)
                             val file = File(newImagePath)
                             val newImageUri = Uri.fromFile(file)
-                            startPhotoZoom(newImageUri)
+//                            startPhotoZoom(newImageUri)
+                            startPhotoZoomByCrop(newImageUri)
                         }
 
                     } else {
                         // 处理路径获取失败的情况
-                        startPhotoZoom(output.savedUri!!)
+//                        startPhotoZoom(output.savedUri!!)
+                        startPhotoZoomByCrop(output.savedUri!!)
                     }
                 }
             }
@@ -319,6 +330,54 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         cropImageLauncher.launch(intent)
     }
 
+    private fun startPhotoZoomByCrop(uri: Uri) {
+        val options = UCrop.Options()
+// 修改标题栏颜色
+        options.setToolbarColor(context.getColor(android.R.color.white))
+// 修改状态栏颜色
+        options.setStatusBarColor(context.getColor(android.R.color.black))
+// 隐藏底部工具
+        options.setHideBottomControls(true)
+// 图片格式
+        options.setCompressionFormat(Bitmap.CompressFormat.JPEG)
+// 设置图片压缩质量
+        options.setCompressionQuality(100)
+// 让用户调整范围
+        options.setFreeStyleCropEnabled(true)
+// 设置图片压缩质量
+        options.setCompressionQuality(100)
+// 圆形裁剪
+        options.setCircleDimmedLayer(false)
+// 不显示网格线
+        options.setShowCropGrid(false)
+        options.withAspectRatio(4f, 3f) // 设置默认比例
+
+        val fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+// 设置源uri及目标uri
+        val destinationUri = Uri.fromFile(File(fileDir, "${System.currentTimeMillis()}.jpg"))
+        val uCropIntent = UCrop.of(uri, destinationUri)
+            .withMaxResultSize(200, 200)  // 图片大小
+            .withOptions(options)        // 传递配置参数
+            .getIntent(this)
+        uCropLauncher.launch(uCropIntent)
+    }
+
+    private var  uCropLauncher= registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode ==RESULT_OK) {
+            result.data?.let { intent ->
+                val resultUri = UCrop.getOutput(intent)
+                // 处理裁剪结果，比如显示图片或保存图片
+                if (resultUri != null) {
+                    getRealPathFromUri(this, mSavedUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
+                    finish()
+                }
+            }
+        } else  {
+            initConfig()
+        }
+    }
+
     private var cropImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             // 裁剪完成后的操作
@@ -384,4 +443,4 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         return file.absolutePath // 返回保存后的文件路径
     }
 
-}
+}  private const val TAG = "PreviewViewActivity"
