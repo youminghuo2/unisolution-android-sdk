@@ -61,7 +61,7 @@
         android:layout_width="60dp"
         android:layout_margin="10dp"
         android:padding="15dp"
-
+        android:visibility="gone"
         android:src="@drawable/camera_save"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
