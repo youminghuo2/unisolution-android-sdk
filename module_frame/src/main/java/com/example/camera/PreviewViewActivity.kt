@@ -13,6 +13,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -31,6 +32,7 @@ import com.example.module_frame.databinding.ActivityPreviewViewBinding
 import com.example.module_frame.extend.CameraHelper
 import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.utils.CropFileUtils
+import com.example.module_frame.utils.NoDoubleClickListener
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.yalantis.ucrop.UCrop
 import java.io.File
@@ -125,9 +127,11 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 
     override fun initClick() {
         //拍摄
-        binding.takePhotoImg.setOnClickListener {
-            takePhoto()
-        }
+        binding.takePhotoImg.setOnClickListener(object : NoDoubleClickListener() {
+            override fun onNoDoubleClick(v: View?) {
+                takePhoto()
+            }
+        })
 
         //关闭
         binding.closeImg.setOnClickListener {
