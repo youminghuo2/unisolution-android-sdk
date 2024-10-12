@@ -52,13 +52,14 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     private var callback: PreviewCallback? = null
     private var mFacingFront = false  //是否是前置摄像头
 
-   private var authorities=""
+    private var authorities = ""
 
     override fun initView() {
         WindowCompat.setDecorFitsSystemWindows(window, false) // Make content extend into status bar
         window.statusBarColor = Color.TRANSPARENT
         val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-        insetsController.isAppearanceLightStatusBars = false // Set status bar icons to white (dark background)
+        insetsController.isAppearanceLightStatusBars =
+            false // Set status bar icons to white (dark background)
 
         startCamera()
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -70,8 +71,8 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 //            @Suppress("DEPRECATION")
 //            intent.getSerializableExtra("callback") as? PreviewCallback
 //        }
-        callback= CameraHelper.callback
-        authorities= intent.getStringExtra("authorities").toString()
+        callback = CameraHelper.callback
+        authorities = intent.getStringExtra("authorities").toString()
     }
 
     private fun startCamera() {
@@ -79,8 +80,8 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     }
 
 
-    private fun switchCamera(switch:Boolean){
-        if (switch){
+    private fun switchCamera(switch: Boolean) {
+        if (switch) {
             mFacingFront = !mFacingFront
         }
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -135,12 +136,12 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 
         //关闭
         binding.closeImg.setOnClickListener {
-           if (binding.photosGroup.isVisible){
-               binding.cameraGroup.isVisible=true
-               binding.photosGroup.isVisible=false
-           }else{
-               finish()
-           }
+            if (binding.photosGroup.isVisible) {
+                binding.cameraGroup.isVisible = true
+                binding.photosGroup.isVisible = false
+            } else {
+                finish()
+            }
         }
 
         //保存
@@ -158,8 +159,8 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
                 val y = event.y.toInt()
 
                 // 将 ImageView 移动到触摸位置
-                binding.focusIcon.x = x.toFloat() -  binding.focusIcon.width / 2
-                binding.focusIcon.y = y.toFloat() -  binding.focusIcon.height / 2
+                binding.focusIcon.x = x.toFloat() - binding.focusIcon.width / 2
+                binding.focusIcon.y = y.toFloat() - binding.focusIcon.height / 2
                 binding.focusIcon.isVisible = true
                 Handler(Looper.getMainLooper()).postDelayed({
                     binding.focusIcon.isVisible = false
@@ -181,7 +182,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 
         // Create time stamped name and MediaStore entry.
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())+"_"+ UUID.randomUUID().toString()+".jpg"
+            .format(System.currentTimeMillis()) + "_" + UUID.randomUUID().toString() + ".jpg"
 
 //        //存在私有目录
         val fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -224,15 +225,17 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
                     binding.cameraGroup.isVisible = false
                     binding.photosGroup.isVisible = true
 //                    binding.photosImg.load(output.savedUri)   //加载图片
-                    val imagePath: String = getRealPathFromUri(context, output.savedUri!!).toString()
+                    val imagePath: String =
+                        getRealPathFromUri(context, output.savedUri!!).toString()
                     if (imagePath != null) {
-                        val degree =CropFileUtils.readPictureDegree(imagePath)
+                        val degree = CropFileUtils.readPictureDegree(imagePath)
                         if (degree == 0) {
 //                            startPhotoZoom(output.savedUri!!)
                             startPhotoZoomByCrop(output.savedUri!!)
-                        }else{
+                        } else {
                             val bitmap = BitmapFactory.decodeFile(imagePath)
-                            val rotatedBitmap: Bitmap = CropFileUtils.rotaingImageView(degree, bitmap)
+                            val rotatedBitmap: Bitmap =
+                                CropFileUtils.rotaingImageView(degree, bitmap)
                             val newImagePath: String = saveBitmapToFile(rotatedBitmap)
                             val file = File(newImagePath)
                             val newImageUri = Uri.fromFile(file)
@@ -277,14 +280,15 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     }
 
 
-
     private var uriClipUri: Uri? = null //裁剪图片的的地址，最终加载它
+
     /**
      * 图片裁剪的方法 =>原生裁剪
      * @param uri
      */
     private fun startPhotoZoom(uri: Uri) {
-        val intent = Intent("com.android.camera.action.CROP")//com.android.camera.action.CROP，这个action是调用系统自带的图片裁切功能
+        val intent =
+            Intent("com.android.camera.action.CROP")//com.android.camera.action.CROP，这个action是调用系统自带的图片裁切功能
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         val contentUri = FileProvider.getUriForFile(
             this,
@@ -317,7 +321,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
             val cropFile = CropFileUtils.createImageFile(this, true)
             //设置裁剪的图片地址Uri
             uriClipUri = CropFileUtils.uri
-        }else{
+        } else {
             val cropFile = createFile("Crop")
             uriClipUri = Uri.fromFile(cropFile)
         }
@@ -336,28 +340,30 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 
     private fun startPhotoZoomByCrop(uri: Uri) {
         val options = UCrop.Options()
-// 修改标题栏颜色
+        // 修改标题栏颜色
         options.setToolbarColor(context.getColor(android.R.color.white))
-// 修改状态栏颜色
+        // 修改状态栏颜色
         options.setStatusBarColor(context.getColor(android.R.color.black))
-// 隐藏底部工具
+        // 隐藏底部工具
         options.setHideBottomControls(true)
-// 图片格式
+        // 图片格式
         options.setCompressionFormat(Bitmap.CompressFormat.JPEG)
-
-// 让用户调整范围
+        // 让用户调整范围
         options.setFreeStyleCropEnabled(true)
-// 设置图片压缩质量
+        // 设置图片压缩质量
         options.setCompressionQuality(100)
-// 圆形裁剪
+        // 圆形裁剪
         options.setCircleDimmedLayer(false)
-// 不显示网格线
-        options.setShowCropGrid(false)
+        // 显示网格线
+        options.setShowCropGrid(true)
         options.withAspectRatio(4f, 3f) // 设置默认比例
-
+        //设置显示角标和尺寸变化
+        options.setShowCropFrame(true)
+        options.setShowCropFrameUpDown(true)
+        options.setShowChangingSize(true);
         val fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
 
-// 设置源uri及目标uri
+        // 设置源uri及目标uri
         val destinationUri = Uri.fromFile(File(fileDir, "${System.currentTimeMillis()}.jpg"))
         val uCropIntent = UCrop.of(uri, destinationUri)
             .withMaxResultSize(1080, 1920)  // 图片大小
@@ -366,42 +372,50 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         uCropLauncher.launch(uCropIntent)
     }
 
-    private var  uCropLauncher= registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode ==RESULT_OK) {
-            result.data?.let { intent ->
-                val resultUri = UCrop.getOutput(intent)
-                // 处理裁剪结果，比如显示图片或保存图片
-                if (resultUri != null) {
-                    getRealPathFromUri(this, resultUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
-                    finish()
+    private var uCropLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let { intent ->
+                    val resultUri = UCrop.getOutput(intent)
+                    // 处理裁剪结果，比如显示图片或保存图片
+                    if (resultUri != null) {
+                        getRealPathFromUri(
+                            this,
+                            resultUri
+                        )?.let { it1 -> callback?.onPreviewFinished(it1) }
+                        finish()
+                    }
                 }
+            } else {
+                initConfig()
             }
-        } else  {
-            initConfig()
         }
-    }
 
-    private var cropImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            // 裁剪完成后的操作
-                if (uriClipUri != null){
+    private var cropImageLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                // 裁剪完成后的操作
+                if (uriClipUri != null) {
                     Log.d(TAG, "Photo capture failed:$uriClipUri")
-                    getRealPathFromUri(this, uriClipUri)?.let { it1 -> callback?.onPreviewFinished(it1) }
+                    getRealPathFromUri(this, uriClipUri)?.let { it1 ->
+                        callback?.onPreviewFinished(
+                            it1
+                        )
+                    }
                     finish()
-                }
-            else  {
-                // 裁剪被取消，处理取消情况
-                // 例如，显示一个 Toast 消息或者重新启动图片选择流程
+                } else {
+                    // 裁剪被取消，处理取消情况
+                    // 例如，显示一个 Toast 消息或者重新启动图片选择流程
                     initConfig()
+                }
+            } else {
+                //裁剪取消的情况下
+                initConfig()
             }
-        }else{
-           //裁剪取消的情况下
-            initConfig()
         }
-    }
 
 
-    private fun initConfig(){
+    private fun initConfig() {
         binding.cameraGroup.isVisible = true
         binding.photosGroup.isVisible = false
         switchCamera(false)
@@ -411,8 +425,10 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 
     private fun createFile(type: String): File {
         // 在相册创建一个临时文件
-        val picFile = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            "${type}_${System.currentTimeMillis()}.jpg")
+        val picFile = File(
+            context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            "${type}_${System.currentTimeMillis()}.jpg"
+        )
         try {
             if (picFile.exists()) {
                 picFile.delete()
@@ -446,4 +462,6 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
         return file.absolutePath // 返回保存后的文件路径
     }
 
-}  private const val TAG = "PreviewViewActivity"
+}
+
+private const val TAG = "PreviewViewActivity"

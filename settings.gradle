@@ -17,3 +17,4 @@ rootProject.name = "xuece_android_network"
 include ':app'
 include ':retrofit_net'
 include ':module_frame'
+include ':libUCrop'
