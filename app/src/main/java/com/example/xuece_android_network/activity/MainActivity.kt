@@ -12,6 +12,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -36,12 +37,15 @@ import com.example.module_frame.extend.CameraHelper
 import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.utils.CommonUtils
 import com.example.module_frame.utils.CommonUtils.processPermissions
+import com.example.module_frame.utils.PictureSelectorUtil
+import com.example.module_frame.utils.UCropHelper
 import com.example.module_frame.utils.dataStore
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.example.xuece_android_network.common.ComDaraStore
 import com.example.xuece_android_network.common.TagData
 import com.example.xuece_android_network.databinding.ActivityMainBinding
 import com.example.xuece_android_network.viewModel.UserCenterViewModel
+import com.yalantis.ucrop.UCrop
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -56,6 +60,8 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
     private var dialogMsg = ""
     private var fileName = ""
     private lateinit var photoURI: Uri
+    private lateinit var pictureSelectorUtil: PictureSelectorUtil
+
 
     override fun initView() {
 
@@ -220,9 +226,40 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
                 }
             }
         }
+
+        /**
+         * 选择照片
+         */
+        binding.cameraPickBtn.setOnClickListener {
+            pictureSelectorUtil = PictureSelectorUtil()
+            pictureSelectorUtil.showSelector(this,3, uCropLauncher) { }
+        }
     }
 
-    //跳转拍照
+
+private var uCropLauncher: ActivityResultLauncher<Intent> =
+    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.let { intent ->
+                val resultUri = UCrop.getOutput(intent)
+                // 处理裁剪结果，比如显示图片或保存图片
+                if (resultUri != null) {
+                    val list = UCropHelper.getRealPathFromUri(this, resultUri)
+                    list?.let { pictureSelectorUtil.pictureList.add(it) }
+                    Log.d("PictureList", "保存的图片路径: ${pictureSelectorUtil.pictureList}")
+                }
+            }
+            // 每次裁剪结束后，递归处理下一张图片
+            pictureSelectorUtil.currentIndex++
+            pictureSelectorUtil.processNextImage(pictureSelectorUtil.resultList, pictureSelectorUtil.currentIndex) { selectedImagePaths ->
+                // 处理选择完所有图片后的结果
+                Log.d("SelectedImages", "所有保存的图片路径: $selectedImagePaths")
+            }
+        }
+    }
+
+
+    //跳转系统拍照
     private val takePhotoLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
             if (isSaved) {
@@ -296,7 +333,7 @@ class MainActivity : BaseViewBindingActivity<ActivityMainBinding>() {
             }
         }
 
-
+   //根据fileprovider获取uri
     fun createTempPictureUri(
         fileName: String = "picture_${System.currentTimeMillis()}",
         fileExtension: String = ".png"

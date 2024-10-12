@@ -3,6 +3,7 @@ package com.example.module_frame.utils
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -125,5 +126,10 @@ object CommonUtils {
     }
 
 
+    //判断是否是视频
+    fun isVideoUri(context: Context, uri: Uri): Boolean {
+        val mimeType = context.contentResolver.getType(uri)
+        return mimeType?.startsWith("video/") == true
+    }
 
 }

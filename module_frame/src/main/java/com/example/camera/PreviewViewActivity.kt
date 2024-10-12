@@ -13,7 +13,6 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -28,11 +27,12 @@ import coil.load
 import com.dylanc.longan.Logger
 import com.dylanc.longan.context
 import com.dylanc.longan.logDebug
+import com.dylanc.longan.randomUUIDString
 import com.example.module_frame.databinding.ActivityPreviewViewBinding
 import com.example.module_frame.extend.CameraHelper
 import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.utils.CropFileUtils
-import com.example.module_frame.utils.NoDoubleClickListener
+import com.example.module_frame.utils.UCropHelper
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.yalantis.ucrop.UCrop
 import java.io.File
@@ -128,11 +128,9 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
 
     override fun initClick() {
         //拍摄
-        binding.takePhotoImg.setOnClickListener(object : NoDoubleClickListener() {
-            override fun onNoDoubleClick(v: View?) {
-                takePhoto()
-            }
-        })
+        binding.takePhotoImg.setOnClickListener {
+            takePhoto()
+        }
 
         //关闭
         binding.closeImg.setOnClickListener {
@@ -339,36 +337,7 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     }
 
     private fun startPhotoZoomByCrop(uri: Uri) {
-        val options = UCrop.Options()
-        // 修改标题栏颜色
-        options.setToolbarColor(context.getColor(android.R.color.white))
-        // 修改状态栏颜色
-        options.setStatusBarColor(context.getColor(android.R.color.black))
-        // 隐藏底部工具
-        options.setHideBottomControls(true)
-        // 图片格式
-        options.setCompressionFormat(Bitmap.CompressFormat.JPEG)
-        // 让用户调整范围
-        options.setFreeStyleCropEnabled(true)
-        // 设置图片压缩质量
-        options.setCompressionQuality(100)
-        // 圆形裁剪
-        options.setCircleDimmedLayer(false)
-        // 显示网格线
-        options.setShowCropGrid(true)
-        options.withAspectRatio(4f, 3f) // 设置默认比例
-        //设置显示角标和尺寸变化
-        options.setShowCropFrame(true)
-        options.setShowCropFrameUpDown(true)
-        options.setShowChangingSize(true);
-        val fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-
-        // 设置源uri及目标uri
-        val destinationUri = Uri.fromFile(File(fileDir, "${System.currentTimeMillis()}.jpg"))
-        val uCropIntent = UCrop.of(uri, destinationUri)
-            .withMaxResultSize(1080, 1920)  // 图片大小
-            .withOptions(options)        // 传递配置参数
-            .getIntent(this)
+        val uCropIntent = UCropHelper.getUCropIntent(this, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
         uCropLauncher.launch(uCropIntent)
     }
 
