@@ -4,11 +4,16 @@ import static android.os.Environment.DIRECTORY_PICTURES;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
+
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -62,5 +67,9 @@ public class CropUtils {
             return new File(path);
         }
         return null;
+    }
+
+    public static Uri getOutput(@NonNull Intent intent) {
+        return UCrop.getOutput(intent);
     }
 }
