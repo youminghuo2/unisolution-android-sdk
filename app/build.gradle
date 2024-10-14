@@ -11,8 +11,8 @@ android {
         applicationId "com.example.xuece_android_network"
         minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode 128
+        versionName "1.2.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,6 +44,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.exifinterface:exifinterface:1.3.3'
     implementation 'androidx.activity:activity:1.8.0'
+    implementation project(':libUCrop')
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
