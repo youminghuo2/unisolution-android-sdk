@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
     namespace 'com.yalantis.ucrop'
@@ -31,7 +32,27 @@ android {
     buildFeatures {
         buildConfig = true // 需要buildconfig
     }
+}
 
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            group = 'com.github.zcyyouminghuo'
+            version = '1.0.0'
+            //发布release版本
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                //groupId通常是自己的gitee或者GitHub的账户地址
+                groupId = "com.yalantis.ucrop"
+                //artifactId通常是指待发布项目的名称，也就是别名
+                artifactId = 'lib_ucrop'
+                //version通常是指待发布项目的版本号，这里是写死的，通常我们取项目versionName
+                version = version
+            }
+        }
+    }
 }
 
 dependencies {

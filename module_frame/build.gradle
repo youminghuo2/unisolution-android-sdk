@@ -57,6 +57,7 @@ afterEvaluate {
                 artifactId = 'module_frame'
                 //version通常是指待发布项目的版本号，这里是写死的，通常我们取项目versionName
                 version = version
+
             }
         }
     }
