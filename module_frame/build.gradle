@@ -46,7 +46,7 @@ afterEvaluate {
         publications {
             // Creates a Maven publication called "release".
             group = 'com.github.zcyyouminghuo'
-            version = '1.0.0'
+            version = '1.2.7'
             //发布release版本
             release(MavenPublication) {
                 // Applies the component for the release build variant.
@@ -70,6 +70,7 @@ dependencies {
     implementation 'androidx.activity:activity-ktx:1.9.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.activity:activity:1.9.2'
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -93,7 +94,7 @@ dependencies {
     api 'io.github.lucksiege:pictureselector:v3.11.2'
     api 'io.github.lucksiege:compress:v3.11.2'
     api 'com.github.bumptech.glide:glide:4.14.2'
-    api 'com.github.youminghuo2.unisolution-android-sdk:lib_ucrop:v1.2.4'
 
+    implementation project(':libUCrop')
 
 }
