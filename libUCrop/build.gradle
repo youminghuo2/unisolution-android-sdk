@@ -39,17 +39,19 @@ afterEvaluate {
     publishing {
         publications {
             // Creates a Maven publication called "release".
-            group = 'com.github.zcyyouminghuo'
+            group = 'com.github.zcyyouminghuo'  //github地址
             version = '1.0.0'
             //发布release版本
-            release(MavenPublication) {
+            aarAndroid(MavenPublication) {
                 // Applies the component for the release build variant.
+                from components.findByName('release')
                 //groupId通常是自己的gitee或者GitHub的账户地址
-                groupId = "com.yalantis.ucrop"
+                groupId = "com.yalantis.ucrop"   //项目包名
                 //artifactId通常是指待发布项目的名称，也就是别名
-                artifactId = 'lib_ucrop'
+                artifactId = 'ucrop_library'   //依赖名称
                 //version通常是指待发布项目的版本号，这里是写死的，通常我们取项目versionName
-                version = version
+                version = '1.0.0'
+                afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) }
             }
         }
     }
