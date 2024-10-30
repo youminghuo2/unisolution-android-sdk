@@ -3,6 +3,7 @@ package com.yalantis.ucrop.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -52,6 +53,7 @@ public class OverlayView extends View {
     protected float[] mCropGridCorners;
     protected float[] mCropGridCenter;
     protected float[] mUpDownCropGridCorner;
+//    protected float[] mLeftRightCropGridCorner;
 
     private int mCropGridRowCount, mCropGridColumnCount;
     private float mTargetAspectRatio;
@@ -386,7 +388,7 @@ public class OverlayView extends View {
      * * The order of the corners is:
      * 0----5-->1
      * ^        |
-     * |   4    |
+     * 7   4    8
      * |        v
      * 3<---6---2
      */
@@ -412,6 +414,12 @@ public class OverlayView extends View {
                 break;
             case 6:
                 mTempRect.set(mCropViewRect.left, mCropViewRect.top, mCropViewRect.right, touchY);
+                break;
+            case 7:
+                mTempRect.set(touchX, mCropViewRect.top, mCropViewRect.right, mCropViewRect.bottom);
+                break;
+            case 8:
+                mTempRect.set(mCropViewRect.left, mCropViewRect.top, touchX, mCropViewRect.bottom);
                 break;
             // move rectangle
             case 4:
@@ -448,7 +456,7 @@ public class OverlayView extends View {
      * * The order of the corners in the float array is:
      * 0---5--->1
      * ^        |
-     * |   4    |
+     * 7   4    8
      * |        v
      * 3<---6---2
      *
@@ -467,16 +475,12 @@ public class OverlayView extends View {
         }
 
         if (mNeedUpDownCorner) {
-            for ( int i=0; i < 4; i += 2) {
+            for ( int i=0; i < 8; i += 2) {
                 double distanceToCorner = Math.sqrt(Math.pow(touchX - mUpDownCropGridCorner[i], 2)
                         + Math.pow(touchY - mUpDownCropGridCorner[i + 1], 2));
                 if (distanceToCorner < closestPointDistance) {
                     closestPointDistance = distanceToCorner;
-                    if (i < 2) {
-                        closestPointIndex = 5;
-                    } else {
-                        closestPointIndex = 6;
-                    }
+                    closestPointIndex = i / 2 + 5;
                 }
             }
         }
@@ -565,15 +569,28 @@ public class OverlayView extends View {
             canvas.save();
 
             if(mNeedUpDownCorner) { //绘制中间位置上下和四个角的角标
-                mTempRect.set(mCropViewRect);
-                mTempRect.inset(-mCropRectCornerTouchAreaLineLength, mCropRectCornerTouchAreaLineLength);
+                mTempRect.set(mCropViewRect.left - mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.top + mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.right + mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.centerY() - mCropRectCornerTouchAreaLineLength /2.0f);
                 canvas.clipRect(mTempRect, Region.Op.DIFFERENCE);
 
-
-                mTempRect.set(mCropViewRect.left + mCropRectCornerTouchAreaLineLength, mCropViewRect.top - mCropRectCornerTouchAreaLineLength, mCropViewRect.centerX() - mCropRectCornerTouchAreaLineLength / 2.0f, mCropViewRect.bottom + mCropRectCornerTouchAreaLineLength);
+                mTempRect.set(mCropViewRect.left - mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.centerY() + mCropRectCornerTouchAreaLineLength /2.0f,
+                        mCropViewRect.right + mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.bottom - mCropRectCornerTouchAreaLineLength);
                 canvas.clipRect(mTempRect, Region.Op.DIFFERENCE);
 
-                mTempRect.set(mCropViewRect.centerX() + mCropRectCornerTouchAreaLineLength / 2.0f, mCropViewRect.top - mCropRectCornerTouchAreaLineLength, mCropViewRect.right - mCropRectCornerTouchAreaLineLength, mCropViewRect.bottom + mCropRectCornerTouchAreaLineLength);
+                mTempRect.set(mCropViewRect.left + mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.top - mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.centerX() - mCropRectCornerTouchAreaLineLength / 2.0f,
+                        mCropViewRect.bottom + mCropRectCornerTouchAreaLineLength);
+                canvas.clipRect(mTempRect, Region.Op.DIFFERENCE);
+
+                mTempRect.set(mCropViewRect.centerX() + mCropRectCornerTouchAreaLineLength / 2.0f,
+                        mCropViewRect.top - mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.right - mCropRectCornerTouchAreaLineLength,
+                        mCropViewRect.bottom + mCropRectCornerTouchAreaLineLength);
                 canvas.clipRect(mTempRect, Region.Op.DIFFERENCE);
 
             } else { //只绘制四个角标
@@ -586,7 +603,8 @@ public class OverlayView extends View {
                 canvas.clipRect(mTempRect, Region.Op.DIFFERENCE);
             }
 
-            mCropFrameCornersPaint.setStrokeWidth(20);
+            mCropFrameCornersPaint.setStrokeWidth(16);
+            mCropFrameCornersPaint.setColor(Color.parseColor("#5197ff"));
             canvas.drawRect(mCropViewRect, mCropFrameCornersPaint);
             canvas.restore();
         }
@@ -631,15 +649,17 @@ public class OverlayView extends View {
                 getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_frame_stoke_width));
         int cropFrameColor = a.getColor(R.styleable.ucrop_UCropView_ucrop_frame_color,
                 getResources().getColor(R.color.ucrop_color_default_crop_frame));
+        int cropCornerColor = a.getColor(R.styleable.ucrop_UCropView_ucrop_corner_color,
+                getResources().getColor(R.color.ucrop_color_default_crop_corner));
 
         mCropFramePaint.setStrokeWidth(cropFrameStrokeSize);
         mCropFramePaint.setColor(cropFrameColor);
         mCropFramePaint.setStyle(Paint.Style.STROKE);
 
         mCropFrameCornersPaint.setStrokeWidth(cropFrameStrokeSize * 3);
-        mCropFrameCornersPaint.setColor(cropFrameColor);
+        mCropFrameCornersPaint.setColor(cropCornerColor);
         mCropFrameCornersPaint.setStyle(Paint.Style.STROKE);
-        
+
         mChangeSizePaint.setColor(cropFrameColor);
         mChangeSizePaint.setTextSize(getResources().getDimensionPixelSize(R.dimen.ucrop_default_crop_changing_size_content_text_size));
     }

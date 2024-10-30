@@ -25,5 +25,5 @@
     <dimen name="ucrop_default_crop_rect_corner_touch_threshold">30dp</dimen>
     <dimen name="ucrop_default_crop_rect_min_size">100dp</dimen>
     <dimen name="ucrop_default_crop_rect_corner_touch_area_line_length">20dp</dimen>
-    <dimen name="ucrop_default_crop_changing_size_content_text_size">10dp</dimen>
+    <dimen name="ucrop_default_crop_changing_size_content_text_size">12dp</dimen>
 </resources>

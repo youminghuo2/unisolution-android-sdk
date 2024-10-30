@@ -30,7 +30,7 @@ public class RectUtils {
      * 获取上下平行角标
      * -----5----
      * ^        |
-     * |        |
+     * 7        8
      * |        |
      * |        v
      * <----6----
@@ -39,7 +39,10 @@ public class RectUtils {
     public static float[] getCornersUpDownFromRect(RectF r) {
         return new float[]{
                 r.centerX(), r.top,
-                r.centerX(), r.bottom
+                r.centerX(), r.bottom,
+                r.left, r.centerY(),
+                r.right, r.centerY()
+
         };
     }
 
