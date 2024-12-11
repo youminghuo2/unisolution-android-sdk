@@ -178,6 +178,12 @@ public class UCropActivity extends AppCompatActivity {
         } else if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
+        } else if (item.getItemId() == R.id.action_rotate_left) {
+            rotateByAngle(-90);
+            return true;
+        } else if (item.getItemId() == R.id.action_rotate_right) {
+            rotateByAngle(90);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

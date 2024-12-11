@@ -3,10 +3,21 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_rotate_left"
+        android:icon="@drawable/rotate_left"
+        android:title="Button 1"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_rotate_right"
+        android:icon="@drawable/rotate_right"
+        android:title="Button 2"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/menu_crop"
         android:icon="@drawable/ucrop_ic_done"
         android:title="@string/ucrop_menu_crop"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/menu_loader"
