@@ -63,7 +63,7 @@ import androidx.transition.TransitionManager;
 @SuppressWarnings("ConstantConditions")
 public class UCropActivity extends AppCompatActivity {
 
-    public static final int DEFAULT_COMPRESS_QUALITY = 90;
+    public static final int DEFAULT_COMPRESS_QUALITY = 60;
     public static final Bitmap.CompressFormat DEFAULT_COMPRESS_FORMAT = Bitmap.CompressFormat.JPEG;
 
     public static final int NONE = 0;
