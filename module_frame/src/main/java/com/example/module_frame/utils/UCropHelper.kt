@@ -24,7 +24,7 @@ object UCropHelper {
         // 让用户调整范围
         options.setFreeStyleCropEnabled(true)
         // 设置图片压缩质量
-        options.setCompressionQuality(100)
+        options.setCompressionQuality(60)
         // 圆形裁剪
         options.setCircleDimmedLayer(false)
         // 显示网格线
@@ -41,7 +41,7 @@ object UCropHelper {
 
         // 创建UCrop裁剪意图并返回
         return UCrop.of(uri, destinationUri)
-            .withMaxResultSize(1080, 1920)
+//            .withMaxResultSize(1080, 1920)
             .withOptions(options)
             .getIntent(context)
     }
