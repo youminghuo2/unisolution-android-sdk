@@ -673,7 +673,7 @@ public class UCropActivity extends AppCompatActivity {
         mBlockingView.setClickable(true);
         mShowLoader = true;
         supportInvalidateOptionsMenu();
-        Log.d("UcropActivity",mCompressQuality+"的值");
+//        Log.d("UcropActivity",mCompressQuality+"的值");
 
         mGestureCropImageView.cropAndSaveImage(mCompressFormat, mCompressQuality, new BitmapCropCallback() {
 
