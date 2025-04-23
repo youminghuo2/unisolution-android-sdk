@@ -26,7 +26,7 @@ open class BaseViewModel : ViewModel() {
         } catch (e: Exception) {
             e.printStackTrace()
             LogUtils.e(e)
-            ExceptionHandler.handleException(e)
+//            ExceptionHandler.handleException(e)
             onFailure()
         }
         return null

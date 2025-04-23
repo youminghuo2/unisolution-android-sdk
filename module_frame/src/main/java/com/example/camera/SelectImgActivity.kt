@@ -13,7 +13,7 @@ import com.example.module_frame.R
 import com.example.module_frame.databinding.ActivityPreviewViewBinding
 import com.example.module_frame.databinding.ActivitySelectImgBinding
 import com.example.module_frame.utils.PictureSelectorUtil
-import com.example.module_frame.utils.UCropHelper
+//import com.example.module_frame.utils.UCropHelper
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.yalantis.ucrop.UCrop
 
@@ -32,8 +32,8 @@ class SelectImgActivity: BaseViewBindingActivity<ActivitySelectImgBinding>(){
                     val resultUri = UCrop.getOutput(intent)
                     // 处理裁剪结果，比如显示图片或保存图片
                     if (resultUri != null) {
-                        val list = UCropHelper.getRealPathFromUri(this, resultUri)
-                        list?.let { pictureSelectorUtil.pictureList.add(it) }
+//                        val list = UCropHelper.getRealPathFromUri(this, resultUri)
+//                        list?.let { pictureSelectorUtil.pictureList.add(it) }
                         Log.d("PictureList", "保存的图片路径: ${pictureSelectorUtil.pictureList}")
                     }
                 }

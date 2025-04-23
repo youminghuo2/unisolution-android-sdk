@@ -34,7 +34,7 @@ import com.example.module_frame.extend.CameraHelper
 import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.utils.CropFileUtils
 import com.example.module_frame.utils.NoDoubleClickListener
-import com.example.module_frame.utils.UCropHelper
+//import com.example.module_frame.utils.UCropHelper
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.yalantis.ucrop.UCrop
 import java.io.File
@@ -341,8 +341,8 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     }
 
     private fun startPhotoZoomByCrop(uri: Uri) {
-        val uCropIntent = UCropHelper.getUCropIntent(this, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
-        uCropLauncher.launch(uCropIntent)
+//        val uCropIntent = UCropHelper.getUCropIntent(this, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
+//        uCropLauncher.launch(uCropIntent)
     }
 
     private var uCropLauncher =
