@@ -60,8 +60,8 @@ class PictureSelectorUtil {
     }
 
     private fun startPhotoZoomByCrop(uri: Uri, uCropLauncher: ActivityResultLauncher<Intent>, onSelected: (imagePaths: List<String>) -> Unit) {
-        val uCropIntent = UCropHelper.getUCropIntent(context, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
-        uCropLauncher.launch(uCropIntent)
+//        val uCropIntent = UCropHelper.getUCropIntent(context, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
+//        uCropLauncher.launch(uCropIntent)
     }
 
 }
