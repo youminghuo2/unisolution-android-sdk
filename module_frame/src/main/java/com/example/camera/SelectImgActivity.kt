@@ -6,16 +6,12 @@ import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.module_frame.R
-import com.example.module_frame.databinding.ActivityPreviewViewBinding
 import com.example.module_frame.databinding.ActivitySelectImgBinding
 import com.example.module_frame.utils.PictureSelectorUtil
 import com.example.module_frame.utils.UCropHelper
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
 import com.yalantis.ucrop.UCrop
+
 
 class SelectImgActivity: BaseViewBindingActivity<ActivitySelectImgBinding>(){
     private lateinit var pictureSelectorUtil: PictureSelectorUtil
