@@ -6,11 +6,13 @@
         android:id="@+id/action_rotate_left"
         android:icon="@drawable/rotate_left"
         android:title="Button 1"
+        android:visible="false"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_rotate_right"
         android:icon="@drawable/rotate_right"
         android:title="Button 2"
+        android:visible="false"
         app:showAsAction="always" />
 
     <item
