@@ -16,7 +16,7 @@ class PictureSelectorUtil {
     lateinit var resultList: java.util.ArrayList<LocalMedia>
     var pictureList= mutableListOf<String>()
     private lateinit var context:Context
-   private lateinit var uCropLauncher: ActivityResultLauncher<Intent>
+    private lateinit var uCropLauncher: ActivityResultLauncher<Intent>
 
 
     fun showSelector(context: Context,maxSelectNum:Int=1, uCropLauncher: ActivityResultLauncher<Intent>,onSelected: (imagePaths: List<String>) -> Unit) {
@@ -60,8 +60,8 @@ class PictureSelectorUtil {
     }
 
     private fun startPhotoZoomByCrop(uri: Uri, uCropLauncher: ActivityResultLauncher<Intent>, onSelected: (imagePaths: List<String>) -> Unit) {
-//        val uCropIntent = UCropHelper.getUCropIntent(context, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
-//        uCropLauncher.launch(uCropIntent)
+        val uCropIntent = UCropHelper.getUCropIntent(context, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
+        uCropLauncher.launch(uCropIntent)
     }
 
 }

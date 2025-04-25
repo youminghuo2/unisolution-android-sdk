@@ -13,7 +13,7 @@ import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 
-//import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -69,7 +69,7 @@ public class CropUtils {
         return null;
     }
 
-//    public static Uri getOutput(@NonNull Intent intent) {
-//        return UCrop.getOutput(intent);
-//    }
+    public static Uri getOutput(@NonNull Intent intent) {
+        return UCrop.getOutput(intent);
+    }
 }

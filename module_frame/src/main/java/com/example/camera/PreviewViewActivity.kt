@@ -34,9 +34,9 @@ import com.example.module_frame.extend.CameraHelper
 import com.example.module_frame.interfaces.PreviewCallback
 import com.example.module_frame.utils.CropFileUtils
 import com.example.module_frame.utils.NoDoubleClickListener
-//import com.example.module_frame.utils.UCropHelper
+import com.example.module_frame.utils.UCropHelper
 import com.example.module_frame.viewBinding.BaseViewBindingActivity
-//import com.yalantis.ucrop.UCrop
+import com.yalantis.ucrop.UCrop
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -341,28 +341,28 @@ class PreviewViewActivity : BaseViewBindingActivity<ActivityPreviewViewBinding>(
     }
 
     private fun startPhotoZoomByCrop(uri: Uri) {
-//        val uCropIntent = UCropHelper.getUCropIntent(this, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
-//        uCropLauncher.launch(uCropIntent)
+        val uCropIntent = UCropHelper.getUCropIntent(this, uri, "${System.currentTimeMillis()}_$randomUUIDString.jpg")
+        uCropLauncher.launch(uCropIntent)
     }
 
-//    private var uCropLauncher =
-//        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//            if (result.resultCode == RESULT_OK) {
-//                result.data?.let { intent ->
-//                    val resultUri = UCrop.getOutput(intent)
+    private var uCropLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let { intent ->
+                    val resultUri = UCrop.getOutput(intent)
                     // 处理裁剪结果，比如显示图片或保存图片
-//                    if (resultUri != null) {
-//                        getRealPathFromUri(
-//                            this,
-//                            resultUri
-//                        )?.let { it1 -> callback?.onPreviewFinished(it1) }
-//                        finish()
-//                    }
-//                }
-//            } else {
-//                initConfig()
-//            }
-//        }
+                    if (resultUri != null) {
+                        getRealPathFromUri(
+                            this,
+                            resultUri
+                        )?.let { it1 -> callback?.onPreviewFinished(it1) }
+                        finish()
+                    }
+                }
+            } else {
+                initConfig()
+            }
+        }
 
     private var cropImageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
